@@ -2,12 +2,12 @@ CC = g++
 CFLAGS = -Wall -Wextra
 
 SOURCES = $(wildcard source/*.cpp)
-OBJECTS = $(patsubst source/%.cpp, %.o, $(SOURCES))
+OBJECTS = $(patsubst source/%.cpp, source/%.o, $(SOURCES))
 
 rtx: $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@
 
-%.o: source/%.cpp
+source/%.o: source/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
