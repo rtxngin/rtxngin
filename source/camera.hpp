@@ -5,11 +5,17 @@
 #include "hittable.hpp"
 #include "material.hpp"
 
+#include <thread>
+#include <vector>
+#include <iomanip>
+#include <mutex>
+
 class camera
 {
 public:
 	double aspect_ratio = 1.0;
 	int image_width = 100;
+	int image_height;
 	int samples_per_pixel = 10;
 	int max_depth = 10;
 
@@ -28,32 +34,39 @@ public:
 
 		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-		for(int j = 0; j < image_height; ++j)
+		const int num_threads = std::thread::hardware_concurrency();
+		std::vector<std::vector<color>> thread_buffers(num_threads, std::vector<color>(image_width * image_height));
+
+		std::vector<std::thread> threads;
+
+		for(int thread_id = 0; thread_id < num_threads; ++thread_id)
 		{
-			std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
-			for(int i = 0; i < image_width; ++i)
+			threads.emplace_back([this, &world, thread_id, num_threads, &thread_buffers]() {
+				render_thread(world, thread_id, num_threads, thread_buffers[thread_id]);
+			});
+		}
+
+		for(auto& thread : threads)
+		{
+			thread.join();
+		}
+
+		std::vector<color> image_buffer(image_width * image_height);
+		for(int thread_id = 0; thread_id < num_threads; ++thread_id)
+		{
+			for(int i = 0; i < image_width * image_height; ++i)
 			{
-				color pixel_color(0, 0, 0);
-				for (int sample = 0; sample < samples_per_pixel; ++sample) {
-					ray r = get_ray(i, j);
-					pixel_color += ray_color(r, max_depth, world);
-				}
-				write_color(std::cout, pixel_color, samples_per_pixel);
+				image_buffer[i] += thread_buffers[thread_id][i];
 			}
 		}
 
-		std::clog << "\rDone.                 \n";
-	}
+		for(int i = 0; i < image_width * image_height; ++i)
+		{
+			write_color(std::cout, image_buffer[i], samples_per_pixel);
+		}
 
-private:
-	int image_height;
-	point3 center;
-	point3 pixel00_loc;
-	vec3 pixel_delta_u;
-	vec3 pixel_delta_v;
-	vec3 u, v, w;
-	vec3 defocus_disk_u;
-	vec3 defocus_disk_v;
+		std::clog << "\rDone.\n";
+	}
 
 	void initialize()
 	{
@@ -83,6 +96,38 @@ private:
 		auto defocus_radius = focus_dist * tan(degrees_to_radians(defocus_angle / 2));
 		defocus_disk_u = u * defocus_radius;
 		defocus_disk_v = v * defocus_radius;
+	}
+
+private:
+	point3 center;
+	point3 pixel00_loc;
+	vec3 pixel_delta_u;
+	vec3 pixel_delta_v;
+	vec3 u, v, w;
+	vec3 defocus_disk_u;
+	vec3 defocus_disk_v;
+
+	std::mutex print_mutex;
+
+	void render_thread(const hittable& world, int thread_id, int num_threads, std::vector<color>& thread_buffer)
+	{
+		for (int j = thread_id; j < image_height; j += num_threads)
+		{
+			print_mutex.lock();
+			std::clog << '\r' << "Thread " << thread_id << " working on scanline " << j << "..." << std::flush;
+			print_mutex.unlock();
+
+			for (int i = 0; i < image_width; ++i)
+			{
+				color pixel_color(0, 0, 0);
+				for (int sample = 0; sample < samples_per_pixel; ++sample)
+				{
+					ray r = get_ray(i, j);
+					pixel_color += ray_color(r, max_depth, world);
+				}
+				thread_buffer[i + j * image_width] = pixel_color;
+			}
+		}
 	}
 
 	ray get_ray(int i, int j) const {
@@ -118,7 +163,7 @@ private:
 			color attenuation;
 			if (rec.mat->scatter(r, rec, attenuation, scattered))
 				return attenuation * ray_color(scattered, depth - 1, world);
-			return color(0,0,0);
+			return color(0, 0, 0);
 		}
 
 		vec3 unit_direction = unit_vector(r.direction());
