@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <minifb.h>
+
 #include "color.hpp"
 #include "vector3.hpp"
 #include "ray.hpp"
@@ -9,6 +11,9 @@
 #include "sphere.hpp"
 #include "rtweekend.hpp"
 #include "camera.hpp"
+
+uint32_t* buffer = nullptr;
+struct mfb_window* window = nullptr;
 
 int main()
 {
@@ -34,7 +39,7 @@ int main()
 	camera cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 400;
+	cam.image_width = 800;
 	cam.samples_per_pixel = 100;
 	cam.max_depth = 50;
 
@@ -48,5 +53,27 @@ int main()
 
 	cam.initialize();
 
-	cam.render(world);
+	window = mfb_open_ex("RTXNGIN", cam.image_width, cam.image_height, WF_RESIZABLE);
+	if (!window)
+	{
+		throw std::runtime_error("Failed to create a window!");
+	}
+
+	buffer = (uint32_t*)malloc(cam.image_width * cam.image_height * 4);
+
+	do
+	{
+		int state = mfb_update_ex(window, buffer, cam.image_width, cam.image_height);
+
+		cam.render(world);
+
+		if(state < 0)
+		{
+			window = nullptr;
+			break;
+		}
+	} while (mfb_wait_sync(window));
+
+	free(buffer);
+	mfb_close(window);
 }

@@ -1,0 +1,88 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"minifb/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 406,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 408,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 409,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"minifb/minifb.lib"
+			],
+			"targetId" : "minifb::@afe4e7f4adaf02d6b578",
+			"targetIndex" : 5,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"minifb/include/MiniFB.h",
+				"minifb/include/MiniFB_cpp.h",
+				"minifb/include/MiniFB_enums.h",
+				"minifb/include/MiniFB_ios.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/minifb",
+			"exportName" : "minifb",
+			"exportTargets" : 
+			[
+				{
+					"id" : "minifb::@afe4e7f4adaf02d6b578",
+					"index" : 5
+				}
+			],
+			"paths" : 
+			[
+				"minifb/CMakeFiles/Export/35f209a31e19d7059635a70a8dfb542f/minifb-config.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "minifb",
+		"source" : "minifb"
+	}
+}

@@ -5,10 +5,16 @@
 #include "hittable.hpp"
 #include "material.hpp"
 
+#include <minifb.h>
+
 #include <thread>
 #include <vector>
 #include <iomanip>
 #include <mutex>
+#include <cstdint>
+
+extern uint32_t* buffer;
+extern struct mfb_window* window;
 
 class camera
 {
@@ -28,44 +34,37 @@ public:
 	double defocus_angle = 0;
 	double focus_dist = 10;
 
-	void render(const hittable& world)
+	void render(hittable_list& world)
 	{
-		initialize();
-
-		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
-		const int num_threads = std::thread::hardware_concurrency();
-		std::vector<std::vector<color>> thread_buffers(num_threads, std::vector<color>(image_width * image_height));
-
-		std::vector<std::thread> threads;
-
-		for(int thread_id = 0; thread_id < num_threads; ++thread_id)
+		for (int j = 0; j < this->image_height; ++j)
 		{
-			threads.emplace_back([this, &world, thread_id, num_threads, &thread_buffers]() {
-				render_thread(world, thread_id, num_threads, thread_buffers[thread_id]);
-			});
-		}
-
-		for(auto& thread : threads)
-		{
-			thread.join();
-		}
-
-		std::vector<color> image_buffer(image_width * image_height);
-		for(int thread_id = 0; thread_id < num_threads; ++thread_id)
-		{
-			for(int i = 0; i < image_width * image_height; ++i)
+			for (int i = 0; i < this->image_width; ++i)
 			{
-				image_buffer[i] += thread_buffers[thread_id][i];
+				color pixel_color(0, 0, 0);
+				for (int sample = 0; sample < this->samples_per_pixel; ++sample)
+				{
+					ray r = get_ray(i, j);
+					pixel_color += ray_color(r, this->max_depth, world);
+				}
+
+				auto r = pixel_color.x();
+				auto g = pixel_color.y();
+				auto b = pixel_color.z();
+
+				auto scale = 1.0 / samples_per_pixel;
+				r *= scale;
+				g *= scale;
+				b *= scale;
+
+				r = linear_to_gamma(r);
+				g = linear_to_gamma(g);
+				b = linear_to_gamma(b);
+
+				static const interval intensity(0.000, 0.999);
+				buffer[j * this->image_width + i] = (static_cast<int>(256 * intensity.clamp(r)) << 16) | (static_cast<int>(256 * intensity.clamp(g)) << 8) | static_cast<int>(256 * intensity.clamp(b));
 			}
+			mfb_update_ex(window, buffer, this->image_width, this->image_height);
 		}
-
-		for(int i = 0; i < image_width * image_height; ++i)
-		{
-			write_color(std::cout, image_buffer[i], samples_per_pixel);
-		}
-
-		std::clog << "\rDone.\n";
 	}
 
 	void initialize()
@@ -106,29 +105,6 @@ private:
 	vec3 u, v, w;
 	vec3 defocus_disk_u;
 	vec3 defocus_disk_v;
-
-	std::mutex print_mutex;
-
-	void render_thread(const hittable& world, int thread_id, int num_threads, std::vector<color>& thread_buffer)
-	{
-		for (int j = thread_id; j < image_height; j += num_threads)
-		{
-			print_mutex.lock();
-			std::clog << '\r' << "Thread " << thread_id << " working on scanline " << j << "..." << std::flush;
-			print_mutex.unlock();
-
-			for (int i = 0; i < image_width; ++i)
-			{
-				color pixel_color(0, 0, 0);
-				for (int sample = 0; sample < samples_per_pixel; ++sample)
-				{
-					ray r = get_ray(i, j);
-					pixel_color += ray_color(r, max_depth, world);
-				}
-				thread_buffer[i + j * image_width] = pixel_color;
-			}
-		}
-	}
 
 	ray get_ray(int i, int j) const {
 		auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);

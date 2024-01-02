@@ -1,0 +1,167 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "minifb",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-minifb-Debug-21608bf53e1318017b3f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.7"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "minifb",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RTXNGIN",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "MiniFB",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "RTXNGIN::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RTXNGIN-Debug-ff7dcbef3c349b5bd149.json",
+					"name" : "RTXNGIN",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "fullscreen::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-fullscreen-Debug-121fc8f01498e95b3040.json",
+					"name" : "fullscreen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "hidpi::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-hidpi-Debug-5c1bb1a041469c0506a8.json",
+					"name" : "hidpi",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "input_events::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-input_events-Debug-062037103f0b42223afc.json",
+					"name" : "input_events",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "input_events_cpp::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-input_events_cpp-Debug-30836acd83185c5b5dca.json",
+					"name" : "input_events_cpp",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "minifb::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-minifb-Debug-fc148872848f5b13637b.json",
+					"name" : "minifb",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "multiple_windows::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-multiple_windows-Debug-3c3c4b00a9a02032ddeb.json",
+					"name" : "multiple_windows",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "noise::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-noise-Debug-8d30e4122c4880e58879.json",
+					"name" : "noise",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "timer::@afe4e7f4adaf02d6b578",
+					"jsonFile" : "target-timer-Debug-2ef0524bd71f7fc8edf2.json",
+					"name" : "timer",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/matthewmajf/source/repos/rtxngin/out/build/x64-Debug",
+		"source" : "C:/Users/matthewmajf/source/repos/rtxngin"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
